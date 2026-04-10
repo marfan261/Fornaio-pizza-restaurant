@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fornaio — Artisan Pizza, Karachi</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --fire:    #f04e1a;
+  --fire-d:  #c73d10;
+  --fire-l:  #ff7a45;
+  --gold:    #d4a853;
+  --cream:   #f5ede0;
+  --smoke:   #1a1410;
+  --coal:    #0e0c0a;
+  --ash:     #2c2520;
+  --stone:   #3d352e;
+  --tan:     #7a6a5a;
+  --linen:   #c8b89a;
+  --white:   #ffffff;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'Barlow', sans-serif;
+  --font-label:   'Barlow Condensed', sans-serif;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--coal);
+  color: var(--cream);
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--coal); }
+::-webkit-scrollbar-thumb { background: var(--fire); border-radius: 3px; }
+
+/* ═══════════════════════════════════════
+   NOISE TEXTURE OVERLAY
+═══════════════════════════════════════ */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 0.5;
+}
+
+/* ═══════════════════════════════════════
+   NAV
+═══════════════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  padding: 0 48px;
+  height: 72px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+nav.scrolled {
+  background: rgba(14,12,10,0.95);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 1px 0 rgba(240,78,26,0.2);
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  font-style: italic;
+  color: var(--cream);
+  letter-spacing: -1px;
+  text-decoration: none;
+}
+.nav-logo span { color: var(--fire); }
+.nav-links {
+  display: flex; align-items: center; gap: 36px;
+  list-style: none;
+}
+.nav-links a {
+  font-family: var(--font-label);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--linen);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--fire); }
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.nav-cart-btn {
+  position: relative;
+  background: var(--fire);
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 4px;
+  font-family: var(--font-label);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: background 0.2s, transform 0.15s;
+}
+.nav-cart-btn:hover { background: var(--fire-l); transform: translateY(-1px); }
+.cart-count {
+  background: white; color: var(--fire);
+  width: 20px; height: 20px; border-radius: 50%;
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.3s var(--ease-out);
+}
+.cart-count.bump { transform: scale(1.5); }
+@media (max-width: 768px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+}
+
+/* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+.hero {
+  position: relative;
+  height: 100vh; min-height: 600px;
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 80% at 60% 50%, rgba(240,78,26,0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 60% at 20% 80%, rgba(212,168,83,0.1) 0%, transparent 60%),
+    linear-gradient(160deg, #1a1410 0%, #0e0c0a 60%, #1a1008 100%);
+}
+/* Decorative pizza circle */
+.hero-pizza-ring {
+  position: absolute;
+  right: -5%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(55vw, 680px);
+  height: min(55vw, 680px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #2c1f10, #1a1008 50%, #0e0c0a);
+  border: 1px solid rgba(240,78,26,0.15);
+  box-shadow:
+    inset 0 0 80px rgba(240,78,26,0.12),
+    0 0 120px rgba(240,78,26,0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: min(38vw, 440px);
+  animation: slowSpin 60s linear infinite;
+}
+@keyframes slowSpin {
+  from { transform: translateY(-50%) rotate(0deg); }
+  to   { transform: translateY(-50%) rotate(360deg); }
+}
+.hero-pizza-ring::before {
+  content: '';
+  position: absolute; inset: 20px;
+  border-radius: 50%;
+  border: 1px dashed rgba(240,78,26,0.2);
+}
+.hero-content {
+  position: relative; z-index: 2;
+  padding: 0 48px;
+  max-width: 680px;
+}
+.hero-eyebrow {
+  font-family: var(--font-label);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--fire);
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+  animation: fadeUp 0.8s var(--ease-out) 0.2s both;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: block; width: 32px; height: 1px;
+  background: var(--fire);
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(52px, 8vw, 104px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -2px;
+  color: var(--cream);
+  animation: fadeUp 0.8s var(--ease-out) 0.35s both;
+}
+.hero-title em {
+  display: block;
+  font-style: italic;
+  color: var(--fire);
+}
+.hero-sub {
+  margin-top: 24px;
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--linen);
+  line-height: 1.7;
+  max-width: 440px;
+  animation: fadeUp 0.8s var(--ease-out) 0.5s both;
+}
+.hero-actions {
+  margin-top: 40px;
+  display: flex; gap: 16px; flex-wrap: wrap;
+  animation: fadeUp 0.8s var(--ease-out) 0.65s both;
+}
+.btn-primary {
+  background: var(--fire);
+  color: white;
+  padding: 16px 36px;
+  border: none; border-radius: 4px;
+  font-family: var(--font-label);
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  text-decoration: none; display: inline-block;
+}
+.btn-primary:hover { background: var(--fire-l); transform: translateY(-2px); }
+.btn-ghost {
+  background: transparent;
+  color: var(--cream);
+  padding: 16px 36px;
+  border: 1px solid rgba(245,237,224,0.3);
+  border-radius: 4px;
+  font-family: var(--font-label);
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, transform 0.2s;
+  text-decoration: none; display: inline-block;
+}
+.btn-ghost:hover { border-color: var(--fire); color: var(--fire); transform: translateY(-2px); }
+.hero-stats {
+  position: absolute; bottom: 48px; left: 48px; right: 48px;
+  display: flex; gap: 48px;
+  animation: fadeUp 0.8s var(--ease-out) 0.8s both;
+  z-index: 2;
+}
+.hero-stat-num {
+  font-family: var(--font-display);
+  font-size: 36px; font-weight: 700;
+  color: var(--fire);
+  line-height: 1;
+}
+.hero-stat-label {
+  font-family: var(--font-label);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--tan);
+  margin-top: 4px;
+}
+@media (max-width: 768px) {
+  .hero-content { padding: 0 20px; }
+  .hero-pizza-ring { right: -20%; opacity: 0.3; }
+  .hero-stats { left: 20px; bottom: 32px; gap: 24px; }
+}
+
+/* ═══════════════════════════════════════
+   MARQUEE STRIP
+═══════════════════════════════════════ */
+.marquee-strip {
+  background: var(--fire);
+  padding: 14px 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.marquee-track {
+  display: inline-flex;
+  animation: marquee 28s linear infinite;
+}
+.marquee-track span {
+  font-family: var(--font-label);
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: white;
+  padding: 0 40px;
+}
+.marquee-track span.dot::after {
+  content: ' ◆ ';
+  opacity: 0.6;
+  margin-left: 40px;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ═══════════════════════════════════════
+   ABOUT SECTION
+═══════════════════════════════════════ */
+.about {
+  padding: 100px 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+.about-tag {
+  font-family: var(--font-label);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 4px; text-transform: uppercase;
+  color: var(--fire);
+  margin-bottom: 20px;
+}
+.about-title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--cream);
+  margin-bottom: 24px;
+}
+.about-title em { font-style: italic; color: var(--gold); }
+.about-body {
+  font-size: 16px; font-weight: 300;
+  color: var(--linen); line-height: 1.8;
+  margin-bottom: 32px;
+}
+.about-features {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.about-feat {
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.about-feat-icon {
+  font-size: 22px; margin-top: 2px; flex-shrink: 0;
+}
+.about-feat-text { font-size: 14px; color: var(--linen); line-height: 1.5; }
+.about-feat-text strong { display: block; color: var(--cream); font-weight: 600; margin-bottom: 2px; }
+.about-visual {
+  position: relative;
+}
+.about-card-main {
+  background: var(--ash);
+  border-radius: 12px;
+  padding: 48px;
+  border: 1px solid rgba(245,237,224,0.08);
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.about-card-main::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--fire), var(--gold));
+}
+.about-pizza-emoji { font-size: 120px; display: block; animation: float 4s ease-in-out infinite; }
+@keyframes float {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-12px) rotate(3deg); }
+}
+.about-card-sub {
+  position: absolute;
+  bottom: -20px; right: -20px;
+  background: var(--fire);
+  border-radius: 10px;
+  padding: 20px 24px;
+  text-align: center;
+}
+.about-card-sub .num {
+  font-family: var(--font-display);
+  font-size: 36px; font-weight: 900; color: white; line-height: 1;
+}
+.about-card-sub .lbl {
+  font-family: var(--font-label);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.8);
+}
+@media (max-width: 900px) {
+  .about { grid-template-columns: 1fr; padding: 60px 20px; gap: 48px; }
+}
+
+/* ═══════════════════════════════════════
+   MENU SECTION
+═══════════════════════════════════════ */
+.menu-section {
+  padding: 100px 48px;
+  background: var(--smoke);
+  position: relative;
+}
+.menu-section::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(240,78,26,0.4), transparent);
+}
+.section-header {
+  text-align: center;
+  margin-bottom: 56px;
+}
+.section-tag {
+  font-family: var(--font-label);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 4px; text-transform: uppercase;
+  color: var(--fire); margin-bottom: 14px;
+  display: block;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 900;
+  color: var(--cream);
+  line-height: 1.05;
+}
+.section-title em { font-style: italic; color: var(--gold); }
+.section-sub {
+  margin-top: 16px;
+  font-size: 16px; font-weight: 300;
+  color: var(--tan); max-width: 480px; margin-left: auto; margin-right: auto;
+}
+
+/* Tabs */
+.menu-tabs {
+  display: flex; gap: 4px; justify-content: center;
+  margin-bottom: 52px; flex-wrap: wrap;
+  background: var(--ash);
+  border-radius: 8px;
+  padding: 6px;
+  width: fit-content;
+  margin-left: auto; margin-right: auto;
+}
+.tab-btn {
+  background: transparent; border: none;
+  padding: 10px 28px;
+  font-family: var(--font-label);
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--tan); cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.25s;
+  display: flex; align-items: center; gap: 8px;
+}
+.tab-btn:hover { color: var(--cream); }
+.tab-btn.active {
+  background: var(--fire);
+  color: white;
+}
+
+/* Menu grid */
+.menu-panel { display: none; }
+.menu-panel.active { display: block; }
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  max-width: 1200px; margin: 0 auto;
+}
+
+/* Menu card */
+.menu-card {
+  background: var(--ash);
+  border-radius: 12px;
+  border: 1px solid rgba(245,237,224,0.07);
+  overflow: hidden;
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s ease, border-color 0.3s;
+  position: relative;
+}
+.menu-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(240,78,26,0.2);
+  border-color: rgba(240,78,26,0.25);
+}
+.menu-card-img {
+  height: 180px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 80px;
+  background: radial-gradient(circle at center, rgba(240,78,26,0.12), transparent 70%);
+  position: relative; overflow: hidden;
+  transition: transform 0.5s ease;
+}
+.menu-card:hover .menu-card-img { transform: scale(1.03); }
+.menu-card-badge {
+  position: absolute; top: 12px; left: 12px;
+  background: var(--fire);
+  color: white;
+  font-family: var(--font-label);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 3px;
+}
+.menu-card-badge.veg { background: #2e7d32; }
+.menu-card-badge.hot { background: #b71c1c; }
+.menu-card-body { padding: 20px 22px 22px; }
+.menu-card-name {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 6px;
+}
+.menu-card-desc {
+  font-size: 13px; font-weight: 300;
+  color: var(--tan); line-height: 1.6;
+  margin-bottom: 18px;
+}
+.menu-card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.menu-card-price {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 700;
+  color: var(--fire);
+}
+.menu-card-price span {
+  font-size: 13px; color: var(--tan);
+  font-family: var(--font-body); font-weight: 400;
+}
+.add-btn {
+  background: transparent;
+  border: 1px solid rgba(240,78,26,0.5);
+  color: var(--fire);
+  width: 38px; height: 38px;
+  border-radius: 6px;
+  font-size: 22px; font-weight: 300;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.add-btn:hover {
+  background: var(--fire); color: white;
+  transform: scale(1.08);
+}
+.add-btn:active { transform: scale(0.95); }
+@media (max-width: 768px) {
+  .menu-section { padding: 60px 20px; }
+  .menu-grid { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════
+   SPECIALS BANNER
+═══════════════════════════════════════ */
+.specials {
+  padding: 80px 48px;
+  max-width: 1300px; margin: 0 auto;
+}
+.specials-inner {
+  background: linear-gradient(135deg, #1f1208, #2c1a08);
+  border-radius: 16px;
+  padding: 64px;
+  border: 1px solid rgba(240,78,26,0.2);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 48px;
+  align-items: center;
+  position: relative; overflow: hidden;
+}
+.specials-inner::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--fire), var(--gold), var(--fire));
+}
+.specials-inner::after {
+  content: '🔥';
+  position: absolute;
+  right: 220px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 160px; opacity: 0.07;
+  pointer-events: none;
+}
+.specials-tag {
+  font-family: var(--font-label);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 4px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 16px;
+}
+.specials-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 900;
+  color: var(--cream); line-height: 1.1;
+  margin-bottom: 16px;
+}
+.specials-desc {
+  font-size: 16px; color: var(--linen);
+  font-weight: 300; line-height: 1.7;
+  margin-bottom: 28px;
+}
+.specials-deal {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.price-old {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 700;
+  color: var(--tan); text-decoration: line-through;
+}
+.price-new {
+  font-family: var(--font-display);
+  font-size: 44px; font-weight: 900;
+  color: var(--fire); line-height: 1;
+}
+.deal-badge {
+  background: var(--gold);
+  color: var(--coal);
+  font-family: var(--font-label);
+  font-size: 12px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 4px;
+}
+.specials-cta { text-align: center; }
+.specials-cta .btn-primary { font-size: 15px; padding: 18px 40px; }
+.specials-cta p {
+  margin-top: 12px;
+  font-size: 12px; color: var(--tan);
+  font-family: var(--font-label);
+  letter-spacing: 1px;
+}
+@media (max-width: 900px) {
+  .specials { padding: 40px 20px; }
+  .specials-inner { grid-template-columns: 1fr; padding: 40px 28px; }
+}
+
+/* ═══════════════════════════════════════
+   HOW IT WORKS
+═══════════════════════════════════════ */
+.how-it-works {
+  padding: 100px 48px;
+  background: var(--smoke);
+  text-align: center;
+  position: relative;
+}
+.how-it-works::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212,168,83,0.3), transparent);
+}
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+  max-width: 960px; margin: 56px auto 0;
+  position: relative;
+}
+.steps-grid::before {
+  content: '';
+  position: absolute; top: 52px; left: calc(16.66% + 20px); right: calc(16.66% + 20px);
+  height: 1px;
+  background: linear-gradient(90deg, rgba(240,78,26,0.4), rgba(212,168,83,0.4), rgba(240,78,26,0.4));
+}
+.step { position: relative; }
+.step-num {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--ash);
+  border: 1px solid rgba(240,78,26,0.3);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 32px;
+  position: relative; z-index: 1;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.step:hover .step-num {
+  border-color: var(--fire);
+  box-shadow: 0 0 24px rgba(240,78,26,0.25);
+}
+.step-label {
+  font-family: var(--font-label);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--fire); margin-bottom: 10px;
+}
+.step-title {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 700;
+  color: var(--cream); margin-bottom: 12px;
+}
+.step-desc { font-size: 14px; color: var(--tan); line-height: 1.7; }
+@media (max-width: 700px) {
+  .how-it-works { padding: 60px 20px; }
+  .steps-grid { grid-template-columns: 1fr; gap: 36px; }
+  .steps-grid::before { display: none; }
+}
+
+/* ═══════════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════════ */
+.testimonials {
+  padding: 100px 48px;
+  max-width: 1300px; margin: 0 auto;
+}
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 56px;
+}
+.testi-card {
+  background: var(--ash);
+  border-radius: 12px;
+  padding: 32px;
+  border: 1px solid rgba(245,237,224,0.07);
+  position: relative;
+  transition: transform 0.3s var(--ease-out), border-color 0.3s;
+}
+.testi-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(240,78,26,0.2);
+}
+.testi-quote {
+  font-size: 40px;
+  color: var(--fire); opacity: 0.4;
+  font-family: var(--font-display);
+  line-height: 1;
+  margin-bottom: 16px;
+}
+.testi-text {
+  font-size: 15px; font-weight: 300;
+  color: var(--linen); line-height: 1.8;
+  margin-bottom: 24px;
+  font-style: italic;
+}
+.testi-stars { color: var(--gold); font-size: 14px; margin-bottom: 16px; }
+.testi-author { display: flex; align-items: center; gap: 12px; }
+.testi-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--fire);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 700; color: white;
+}
+.testi-name {
+  font-weight: 600; font-size: 14px; color: var(--cream);
+}
+.testi-loc {
+  font-size: 12px; color: var(--tan);
+  font-family: var(--font-label);
+  letter-spacing: 1px;
+}
+@media (max-width: 900px) {
+  .testimonials { padding: 60px 20px; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════ */
+footer {
+  background: var(--coal);
+  border-top: 1px solid rgba(245,237,224,0.08);
+  padding: 64px 48px 32px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+  max-width: 1200px; margin: 0 auto;
+  padding-bottom: 48px;
+  border-bottom: 1px solid rgba(245,237,224,0.08);
+}
+.footer-brand-name {
+  font-family: var(--font-display);
+  font-size: 32px; font-weight: 900; font-style: italic;
+  color: var(--cream); letter-spacing: -1px; margin-bottom: 12px;
+}
+.footer-brand-name span { color: var(--fire); }
+.footer-brand-desc {
+  font-size: 14px; color: var(--tan);
+  line-height: 1.7; font-weight: 300; max-width: 280px;
+  margin-bottom: 24px;
+}
+.footer-contact-item {
+  font-size: 13px; color: var(--linen);
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.footer-col-title {
+  font-family: var(--font-label);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--fire); margin-bottom: 20px;
+}
+.footer-col ul { list-style: none; }
+.footer-col ul li { margin-bottom: 10px; }
+.footer-col ul li a {
+  font-size: 14px; color: var(--tan);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-col ul li a:hover { color: var(--cream); }
+.footer-bottom {
+  max-width: 1200px; margin: 0 auto;
+  padding-top: 28px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 16px;
+}
+.footer-copy {
+  font-size: 13px; color: var(--tan);
+}
+.footer-copy span { color: var(--fire); }
+.footer-made {
+  font-size: 12px; color: var(--tan);
+  font-family: var(--font-label);
+  letter-spacing: 1px;
+}
+@media (max-width: 900px) {
+  footer { padding: 48px 20px 24px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+}
+@media (max-width: 500px) {
+  .footer-grid { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════
+   CART SIDEBAR
+═══════════════════════════════════════ */
+.cart-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.cart-overlay.open { opacity: 1; pointer-events: all; }
+
+.cart-sidebar {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(420px, 100vw);
+  background: var(--smoke);
+  border-left: 1px solid rgba(245,237,224,0.1);
+  z-index: 2001;
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.4s var(--ease-out);
+}
+.cart-sidebar.open { transform: translateX(0); }
+
+.cart-header {
+  padding: 24px 28px;
+  border-bottom: 1px solid rgba(245,237,224,0.08);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.cart-header h2 {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 700;
+  color: var(--cream);
+}
+.cart-close {
+  background: transparent; border: none;
+  color: var(--tan); font-size: 28px;
+  cursor: pointer; line-height: 1;
+  transition: color 0.2s;
+  padding: 4px 8px;
+}
+.cart-close:hover { color: var(--fire); }
+
+.cart-items {
+  flex: 1; overflow-y: auto;
+  padding: 20px 28px;
+}
+.cart-items::-webkit-scrollbar { width: 4px; }
+.cart-items::-webkit-scrollbar-thumb { background: var(--stone); border-radius: 2px; }
+
+.cart-empty {
+  text-align: center; padding: 60px 20px;
+}
+.cart-empty-icon { font-size: 64px; opacity: 0.3; margin-bottom: 16px; }
+.cart-empty p { font-size: 15px; color: var(--tan); }
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(245,237,224,0.06);
+  animation: slideIn 0.3s var(--ease-out);
+}
+@keyframes slideIn {
+  from { opacity:0; transform:translateX(20px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+.cart-item-thumb {
+  width: 56px; height: 56px;
+  background: var(--ash);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.cart-item-name {
+  font-size: 14px; font-weight: 600; color: var(--cream);
+  margin-bottom: 4px;
+}
+.cart-item-price { font-size: 13px; color: var(--fire); }
+.cart-item-controls {
+  display: flex; align-items: center; gap: 10px;
+}
+.qty-btn {
+  background: var(--ash); border: 1px solid rgba(245,237,224,0.1);
+  color: var(--cream); width: 28px; height: 28px;
+  border-radius: 4px; font-size: 16px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.qty-btn:hover { background: var(--fire); border-color: var(--fire); }
+.qty-num {
+  font-family: var(--font-label);
+  font-size: 15px; font-weight: 700;
+  color: var(--cream); min-width: 20px; text-align: center;
+}
+.remove-btn {
+  background: transparent; border: none;
+  color: rgba(245,237,224,0.25); font-size: 16px;
+  cursor: pointer; padding: 4px;
+  transition: color 0.2s; margin-left: 4px;
+}
+.remove-btn:hover { color: #e53935; }
+
+.cart-footer {
+  padding: 20px 28px 28px;
+  border-top: 1px solid rgba(245,237,224,0.08);
+}
+.cart-subtotal {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px;
+}
+.cart-subtotal span { font-size: 14px; color: var(--tan); }
+.cart-subtotal strong { font-size: 16px; color: var(--cream); }
+.cart-total {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px; padding-top: 12px;
+  border-top: 1px solid rgba(245,237,224,0.08);
+}
+.cart-total span {
+  font-family: var(--font-label);
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--linen);
+}
+.cart-total strong {
+  font-family: var(--font-display);
+  font-size: 28px; font-weight: 700;
+  color: var(--fire);
+}
+.checkout-btn {
+  width: 100%;
+  background: var(--fire);
+  color: white;
+  padding: 18px;
+  border: none; border-radius: 6px;
+  font-family: var(--font-label);
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.checkout-btn:hover { background: var(--fire-l); transform: translateY(-1px); }
+.checkout-btn:disabled {
+  background: var(--stone); cursor: not-allowed; transform: none;
+}
+
+/* ═══════════════════════════════════════
+   ORDER SUCCESS MODAL
+═══════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(8px);
+  z-index: 3000;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal-box {
+  background: var(--ash);
+  border-radius: 16px;
+  padding: 52px 48px;
+  max-width: 480px; width: 100%;
+  text-align: center;
+  border: 1px solid rgba(240,78,26,0.2);
+  animation: modalPop 0.5s var(--ease-out);
+}
+@keyframes modalPop {
+  from { transform:scale(0.85); opacity:0; }
+  to   { transform:scale(1);    opacity:1; }
+}
+.modal-icon { font-size: 72px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 32px; font-weight: 700;
+  color: var(--cream); margin-bottom: 12px;
+}
+.modal-sub { font-size: 15px; color: var(--tan); line-height: 1.7; margin-bottom: 32px; }
+.modal-details {
+  background: var(--stone);
+  border-radius: 8px; padding: 20px;
+  margin-bottom: 28px; text-align: left;
+}
+.modal-detail-row {
+  display: flex; justify-content: space-between;
+  font-size: 14px; color: var(--linen);
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(245,237,224,0.06);
+}
+.modal-detail-row:last-child { border-bottom: none; }
+.modal-detail-row strong { color: var(--cream); }
+.modal-close-btn {
+  width: 100%;
+  background: var(--fire); color: white;
+  padding: 16px; border: none; border-radius: 6px;
+  font-family: var(--font-label);
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.modal-close-btn:hover { background: var(--fire-l); }
+
+/* ═══════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(24px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo">For<span>naio</span></a>
+  <ul class="nav-links">
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#specials">Deals</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-cart-btn" id="cartToggle">
+      🛒 Cart <div class="cart-count" id="cartCount">0</div>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-pizza-ring">🍕</div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Karachi's Finest Artisan Pizza</div>
+    <h1 class="hero-title">
+      Wood-Fired<br>
+      <em>Perfection</em>
+    </h1>
+    <p class="hero-sub">Hand-stretched dough, imported Italian tomatoes, and a 900°F stone oven. Every pizza a masterpiece.</p>
+    <div class="hero-actions">
+      <a href="#menu" class="btn-primary">Order Now</a>
+      <a href="#about" class="btn-ghost">Our Story</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-num">24+</div>
+      <div class="hero-stat-label">Pizza Varieties</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">4.9★</div>
+      <div class="hero-stat-label">Customer Rating</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">30min</div>
+      <div class="hero-stat-label">Avg. Delivery</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MARQUEE ═══ -->
+<div class="marquee-strip">
+  <div class="marquee-track">
+    <span class="dot">Free Delivery on Orders Above Rs. 2000</span>
+    <span class="dot">Wood-Fired Oven</span>
+    <span class="dot">Fresh Dough Daily</span>
+    <span class="dot">Halal Certified</span>
+    <span class="dot">Dine-In & Delivery</span>
+    <span class="dot">Open 12pm – 2am Daily</span>
+    <span class="dot">Free Delivery on Orders Above Rs. 2000</span>
+    <span class="dot">Wood-Fired Oven</span>
+    <span class="dot">Fresh Dough Daily</span>
+    <span class="dot">Halal Certified</span>
+    <span class="dot">Dine-In & Delivery</span>
+    <span class="dot">Open 12pm – 2am Daily</span>
+  </div>
+</div>
+
+<!-- ═══ ABOUT ═══ -->
+<section id="about">
+  <div class="about reveal">
+    <div>
+      <div class="about-tag">Our Philosophy</div>
+      <h2 class="about-title">Baked with <em>fire,</em><br>made with soul</h2>
+      <p class="about-body">Fornaio was born from one obsession — making the perfect Neapolitan pizza in Karachi. We import San Marzano tomatoes, use 00-grade flour, and fire every pie in our hand-built stone oven at 900°F for exactly 90 seconds.</p>
+      <div class="about-features">
+        <div class="about-feat">
+          <div class="about-feat-icon">🌿</div>
+          <div class="about-feat-text"><strong>100% Halal</strong>All meat sourced fresh, certified halal daily</div>
+        </div>
+        <div class="about-feat">
+          <div class="about-feat-icon">🔥</div>
+          <div class="about-feat-text"><strong>Stone Oven</strong>900°F coal-fired for authentic char and crunch</div>
+        </div>
+        <div class="about-feat">
+          <div class="about-feat-icon">🇮🇹</div>
+          <div class="about-feat-text"><strong>Italian Imports</strong>San Marzano tomatoes, Tipo 00 flour</div>
+        </div>
+        <div class="about-feat">
+          <div class="about-feat-icon">🤌</div>
+          <div class="about-feat-text"><strong>Hand-Stretched</strong>Never rolled, always hand-tossed to order</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-visual reveal reveal-delay-2">
+      <div class="about-card-main">
+        <span class="about-pizza-emoji">🍕</span>
+        <p style="font-family:var(--font-display);font-size:18px;font-style:italic;color:var(--linen);margin-top:16px;">"A pizza so good it changed Karachi forever."</p>
+        <div class="about-card-sub">
+          <div class="num">2019</div>
+          <div class="lbl">Est. Year</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MENU ═══ -->
+<section class="menu-section" id="menu">
+  <div class="section-header reveal">
+    <span class="section-tag">Our Menu</span>
+    <h2 class="section-title">Crafted to <em>perfection</em></h2>
+    <p class="section-sub">Every item made fresh to order. No shortcuts. No compromises.</p>
+  </div>
+
+  <div class="menu-tabs reveal">
+    <button class="tab-btn active" data-tab="pizzas">🍕 Pizzas</button>
+    <button class="tab-btn" data-tab="sides">🥗 Sides</button>
+    <button class="tab-btn" data-tab="drinks">🥤 Drinks</button>
+    <button class="tab-btn" data-tab="desserts">🍰 Desserts</button>
+  </div>
+
+  <!-- PIZZAS -->
+  <div class="menu-panel active" id="panel-pizzas">
+    <div class="menu-grid" id="pizza-grid"></div>
+  </div>
+  <!-- SIDES -->
+  <div class="menu-panel" id="panel-sides">
+    <div class="menu-grid" id="sides-grid"></div>
+  </div>
+  <!-- DRINKS -->
+  <div class="menu-panel" id="panel-drinks">
+    <div class="menu-grid" id="drinks-grid"></div>
+  </div>
+  <!-- DESSERTS -->
+  <div class="menu-panel" id="panel-desserts">
+    <div class="menu-grid" id="desserts-grid"></div>
+  </div>
+</section>
+
+<!-- ═══ SPECIALS ═══ -->
+<section id="specials">
+  <div class="specials reveal">
+    <div class="specials-inner">
+      <div>
+        <div class="specials-tag">🔥 Today's Special — Limited Time</div>
+        <h2 class="specials-title">Fornaio Family Feast<br>for Four People</h2>
+        <p class="specials-desc">Two Large Pizzas of your choice + Garlic Bread Basket + 4 Soft Drinks + a Tiramisu to share. The perfect weekend deal for the whole crew.</p>
+        <div class="specials-deal">
+          <div class="price-old">Rs. 4,800</div>
+          <div class="price-new">Rs. 3,200</div>
+          <div class="deal-badge">Save 33%</div>
+        </div>
+      </div>
+      <div class="specials-cta">
+        <button class="btn-primary" onclick="addDeal()">Add Deal to Cart</button>
+        <p>Offer valid today only · While stocks last</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section class="how-it-works">
+  <div class="section-header reveal">
+    <span class="section-tag">How It Works</span>
+    <h2 class="section-title">Pizza at your door in<br><em>3 easy steps</em></h2>
+  </div>
+  <div class="steps-grid reveal">
+    <div class="step">
+      <div class="step-num">📋</div>
+      <div class="step-label">Step 01</div>
+      <h3 class="step-title">Browse & Choose</h3>
+      <p class="step-desc">Explore our full menu of artisan pizzas, sides, and drinks. Filter by size, type, or your mood.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">🛒</div>
+      <div class="step-label">Step 02</div>
+      <h3 class="step-title">Add to Cart</h3>
+      <p class="step-desc">Build your perfect order. Mix and match, add extras, adjust quantities — all in one click.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">🛵</div>
+      <div class="step-label">Step 03</div>
+      <h3 class="step-title">We Deliver Fast</h3>
+      <p class="step-desc">Our riders are on the road in minutes. Real-time tracking, average delivery in 30 minutes or less.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ═══ -->
+<section class="testimonials">
+  <div class="section-header reveal">
+    <span class="section-tag">What People Say</span>
+    <h2 class="section-title">Karachi is <em>obsessed</em></h2>
+  </div>
+  <div class="testimonials-grid reveal">
+    <div class="testi-card">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">Honestly the best pizza I've had this side of Italy. The crust is everything — crispy, chewy, slightly charred. I order twice a week and I'm not ashamed.</p>
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-author">
+        <div class="testi-avatar">A</div>
+        <div>
+          <div class="testi-name">Ahmed Raza</div>
+          <div class="testi-loc">DHA, Karachi</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">Ordered the Spicy Arrabiata and the Truffle Mushroom for my family — both arrived hot, on time, and tasted like they were made by someone who actually cares. Rare in this city.</p>
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-author">
+        <div class="testi-avatar">S</div>
+        <div>
+          <div class="testi-name">Sara Khalid</div>
+          <div class="testi-loc">Clifton, Karachi</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">The wood-fired smell when you open the box is unreal. Took one bite of the BBQ Chicken and sent a second order before I finished the first. Worth every rupee.</p>
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-author">
+        <div class="testi-avatar">U</div>
+        <div>
+          <div class="testi-name">Usman Tariq</div>
+          <div class="testi-loc">Gulshan, Karachi</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer id="contact">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">For<span>naio</span></div>
+      <p class="footer-brand-desc">Artisan wood-fired pizza made with imported Italian ingredients and pure Karachi passion. Dine-in, takeaway & delivery.</p>
+      <div class="footer-contact-item">📍 Plot 24, Khayaban-e-Ittehad, DHA Phase 6, Karachi</div>
+      <div class="footer-contact-item">📞 0311-FORNAIO (367-6246)</div>
+      <div class="footer-contact-item">🕐 Daily 12:00 PM – 2:00 AM</div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Menu</div>
+      <ul>
+        <li><a href="#menu">Classic Pizzas</a></li>
+        <li><a href="#menu">Signature Pizzas</a></li>
+        <li><a href="#menu">Sides & Salads</a></li>
+        <li><a href="#menu">Desserts</a></li>
+        <li><a href="#menu">Drinks</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Info</div>
+      <ul>
+        <li><a href="#about">Our Story</a></li>
+        <li><a href="#specials">Deals</a></li>
+        <li><a href="#">Catering</a></li>
+        <li><a href="#">Franchise</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Follow Us</div>
+      <ul>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">Facebook</a></li>
+        <li><a href="#">TikTok</a></li>
+        <li><a href="#">WhatsApp Order</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 <span>Fornaio</span> · All rights reserved · Karachi, Pakistan</div>
+    <div class="footer-made">Made with 🔥 and good dough</div>
+  </div>
+</footer>
+
+<!-- ═══ CART SIDEBAR ═══ -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <h2>🛒 Your Order</h2>
+    <button class="cart-close" id="cartClose">×</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">
+      <div class="cart-empty-icon">🍕</div>
+      <p>Your cart is empty.<br>Add something delicious!</p>
+    </div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none;">
+    <div class="cart-subtotal">
+      <span>Subtotal</span>
+      <strong id="cartSubtotal">Rs. 0</strong>
+    </div>
+    <div class="cart-subtotal">
+      <span>Delivery</span>
+      <strong style="color:var(--gold)">Free</strong>
+    </div>
+    <div class="cart-total">
+      <span>Total</span>
+      <strong id="cartTotal">Rs. 0</strong>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn">Place Order →</button>
+  </div>
+</div>
+
+<!-- ═══ SUCCESS MODAL ═══ -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal-box">
+    <div class="modal-icon">🎉</div>
+    <h2 class="modal-title">Order Placed!</h2>
+    <p class="modal-sub">Your artisan pizza is being fired up right now. Get ready for something amazing, arriving at your door in about 30 minutes.</p>
+    <div class="modal-details" id="modalDetails"></div>
+    <button class="modal-close-btn" id="modalClose">Awesome, Track My Order →</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   DATA
+═══════════════════════════════════════ */
+const menuData = {
+  pizzas: [
+    { id:1,  name:'Margherita Classica',  emoji:'🍕', price:1490, badge:'Veg', badgeClass:'veg', desc:'San Marzano tomato base, fresh fior di latte, basil, extra virgin olive oil. The original and the best.' },
+    { id:2,  name:'BBQ Chicken Royale',   emoji:'🍗', price:1890, badge:'Best Seller', desc:'Smoky BBQ base, grilled chicken, caramelised onions, cheddar, jalapeños, fresh coriander.' },
+    { id:3,  name:'Spicy Arrabiata',      emoji:'🌶️', price:1690, badge:'Hot', badgeClass:'hot', desc:'Fiery tomato arrabiata, spicy beef mince, red chillies, garlic oil, mozzarella.' },
+    { id:4,  name:'Truffle Mushroom',     emoji:'🍄', price:2190, badge:'Premium', desc:'Cream truffle base, wild mushrooms, caramelised onions, parmesan, fresh thyme.' },
+    { id:5,  name:'Meat Lovers Inferno',  emoji:'🥩', price:2290, badge:'Hot', badgeClass:'hot', desc:'Double mozzarella, beef pepperoni, chicken tikka, beef mince, sausage crumbles, chilli flakes.' },
+    { id:6,  name:'Pesto Garden',         emoji:'🌿', price:1790, badge:'Veg', badgeClass:'veg', desc:'Basil pesto base, roasted peppers, sun-dried tomatoes, artichokes, pine nuts, parmesan.' },
+    { id:7,  name:'Tikka Masala Special', emoji:'🍛', price:1990, desc:'Our Karachi fusion — creamy tikka masala base, chicken tikka, red onion, coriander chutney, mozzarella.' },
+    { id:8,  name:'Four Cheese Dream',    emoji:'🧀', price:2090, badge:'Premium', desc:'Blend of mozzarella, cheddar, gorgonzola, and parmesan on garlic white sauce. Cheese lovers only.' },
+  ],
+  sides: [
+    { id:9,  name:'Garlic Bread Basket',  emoji:'🥖', price:490,  desc:'6 pieces of house bread with roasted garlic butter, fresh parsley, and a side of marinara dip.' },
+    { id:10, name:'Loaded Fries',         emoji:'🍟', price:690,  desc:'Crispy seasoned fries topped with melted cheddar, jalapeños, sour cream, and spring onions.' },
+    { id:11, name:'Caesar Salad',         emoji:'🥗', price:790,  badge:'Veg', badgeClass:'veg', desc:'Romaine lettuce, homemade Caesar dressing, parmesan shavings, focaccia croutons.' },
+    { id:12, name:'Chicken Wings (6pcs)', emoji:'🍗', price:990,  badge:'Hot', badgeClass:'hot', desc:'Crispy fried wings in your choice of Buffalo, BBQ, or Parmesan Herb sauce.' },
+    { id:13, name:'Mozzarella Sticks',    emoji:'🧀', price:690,  desc:'6 golden-fried mozzarella sticks with a crispy herb coating, served with spicy marinara.' },
+    { id:14, name:'Bruschetta Trio',      emoji:'🍞', price:590,  badge:'Veg', badgeClass:'veg', desc:'Three flavours: classic tomato basil, mushroom & truffle, and roasted pepper & feta.' },
+  ],
+  drinks: [
+    { id:15, name:'Italian Soda',         emoji:'🫧', price:290,  badge:'Veg', badgeClass:'veg', desc:'Sparkling water with your choice of flavour syrup — lemon, strawberry, passion fruit, or mint.' },
+    { id:16, name:'Fresh Lemonade',       emoji:'🍋', price:350,  badge:'Veg', badgeClass:'veg', desc:'Freshly squeezed lemons, mint, and a hint of honey. The perfect pizza companion.' },
+    { id:17, name:'Mango Lassi',          emoji:'🥭', price:390,  desc:'Thick, creamy mango lassi made with fresh Sindhri mangoes and full-fat yoghurt.' },
+    { id:18, name:'Fornaio Iced Tea',     emoji:'🍵', price:320,  badge:'Veg', badgeClass:'veg', desc:'House-brewed black tea with lemon, fresh mint, and a touch of brown sugar. Served over ice.' },
+    { id:19, name:'Soft Drinks (Can)',    emoji:'🥤', price:150,  desc:'Pepsi, 7Up, Mountain Dew, Mirinda, or Sting. Ice cold, straight from the fridge.' },
+    { id:20, name:'Still / Sparkling',   emoji:'💧', price:120,  badge:'Veg', badgeClass:'veg', desc:'Nestle Pure Life still water or San Pellegrino sparkling, 500ml.' },
+  ],
+  desserts: [
+    { id:21, name:'Tiramisu',             emoji:'☕', price:690,  desc:'Classic Italian tiramisu — espresso-soaked ladyfingers, mascarpone cream, dusted with dark cocoa.' },
+    { id:22, name:'Nutella Calzone',      emoji:'🫓', price:890,  badge:'Best Seller', desc:'Crispy folded pizza dough filled with warm Nutella, topped with powdered sugar and crushed hazelnuts.' },
+    { id:23, name:'Panna Cotta',          emoji:'🍮', price:590,  badge:'Veg', badgeClass:'veg', desc:'Silky vanilla panna cotta with a fresh strawberry coulis and crushed pistachio garnish.' },
+    { id:24, name:'Choco Lava Brownie',   emoji:'🍫', price:750,  badge:'Hot', badgeClass:'hot', desc:'Warm dark chocolate brownie with a molten centre, served with a scoop of vanilla gelato.' },
+  ],
+};
+
+/* ═══════════════════════════════════════
+   RENDER MENU CARDS
+═══════════════════════════════════════ */
+function renderMenu() {
+  Object.entries(menuData).forEach(([cat, items]) => {
+    const grid = document.getElementById(`${cat}-grid`) ||
+                 document.getElementById(`${cat === 'pizzas' ? 'pizza' : cat}-grid`);
+    if (!grid) return;
+    grid.innerHTML = items.map(item => `
+      <div class="menu-card reveal">
+        <div class="menu-card-img">
+          ${item.badge ? `<div class="menu-card-badge ${item.badgeClass||''}">${item.badge}</div>` : ''}
+          <span>${item.emoji}</span>
+        </div>
+        <div class="menu-card-body">
+          <div class="menu-card-name">${item.name}</div>
+          <div class="menu-card-desc">${item.desc}</div>
+          <div class="menu-card-footer">
+            <div class="menu-card-price">Rs. ${item.price.toLocaleString()}<span> / pizza</span></div>
+            <button class="add-btn" onclick="addToCart(${item.id})" title="Add to cart">+</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    observeReveal(grid.querySelectorAll('.reveal'));
+  });
+}
+
+/* ═══════════════════════════════════════
+   CART STATE
+═══════════════════════════════════════ */
+const allItems = Object.values(menuData).flat();
+let cart = [];
+
+function findItem(id) { return allItems.find(i => i.id === id); }
+function cartTotal() { return cart.reduce((s, ci) => s + findItem(ci.id).price * ci.qty, 0); }
+
+function addToCart(id) {
+  const existing = cart.find(c => c.id === id);
+  if (existing) existing.qty++;
+  else cart.push({ id, qty: 1 });
+  updateCartUI();
+  bumpCount();
+  openCart();
+}
+
+function changeQty(id, delta) {
+  const idx = cart.findIndex(c => c.id === id);
+  if (idx === -1) return;
+  cart[idx].qty += delta;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  updateCartUI();
+}
+
+function removeItem(id) {
+  cart = cart.filter(c => c.id !== id);
+  updateCartUI();
+}
+
+function addDeal() {
+  addToCart(2); addToCart(7);
+  openCart();
+}
+
+function bumpCount() {
+  const el = document.getElementById('cartCount');
+  el.classList.add('bump');
+  setTimeout(() => el.classList.remove('bump'), 300);
+}
+
+function updateCartUI() {
+  const countEl = document.getElementById('cartCount');
+  const itemsEl = document.getElementById('cartItems');
+  const footerEl = document.getElementById('cartFooter');
+  const totalCount = cart.reduce((s,c) => s + c.qty, 0);
+  countEl.textContent = totalCount;
+
+  if (cart.length === 0) {
+    itemsEl.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">🍕</div><p>Your cart is empty.<br>Add something delicious!</p></div>`;
+    footerEl.style.display = 'none';
+    return;
+  }
+
+  footerEl.style.display = 'block';
+  itemsEl.innerHTML = cart.map(ci => {
+    const item = findItem(ci.id);
+    return `
+      <div class="cart-item">
+        <div class="cart-item-thumb">${item.emoji}</div>
+        <div>
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">Rs. ${(item.price * ci.qty).toLocaleString()}</div>
+        </div>
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+          <span class="qty-num">${ci.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+          <button class="remove-btn" onclick="removeItem(${item.id})">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  const total = cartTotal();
+  document.getElementById('cartSubtotal').textContent = `Rs. ${total.toLocaleString()}`;
+  document.getElementById('cartTotal').textContent = `Rs. ${total.toLocaleString()}`;
+}
+
+/* ═══════════════════════════════════════
+   CART OPEN / CLOSE
+═══════════════════════════════════════ */
+function openCart() {
+  document.getElementById('cartSidebar').classList.add('open');
+  document.getElementById('cartOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCart() {
+  document.getElementById('cartSidebar').classList.remove('open');
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('cartToggle').addEventListener('click', openCart);
+document.getElementById('cartClose').addEventListener('click', closeCart);
+document.getElementById('cartOverlay').addEventListener('click', closeCart);
+
+/* ═══════════════════════════════════════
+   CHECKOUT
+═══════════════════════════════════════ */
+document.getElementById('checkoutBtn').addEventListener('click', () => {
+  if (cart.length === 0) return;
+  closeCart();
+
+  const orderItems = cart.map(ci => {
+    const item = findItem(ci.id);
+    return `<div class="modal-detail-row"><span>${item.name} × ${ci.qty}</span><strong>Rs. ${(item.price * ci.qty).toLocaleString()}</strong></div>`;
+  }).join('');
+
+  document.getElementById('modalDetails').innerHTML = `
+    ${orderItems}
+    <div class="modal-detail-row" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(245,237,224,0.15);">
+      <span>Delivery</span><strong style="color:var(--gold)">Free</strong>
+    </div>
+    <div class="modal-detail-row">
+      <span><strong>Order Total</strong></span>
+      <strong style="color:var(--fire);font-size:18px;">Rs. ${cartTotal().toLocaleString()}</strong>
+    </div>
+    <div class="modal-detail-row">
+      <span>Est. Delivery</span><strong>~30 minutes</strong>
+    </div>
+  `;
+
+  document.getElementById('successModal').classList.add('show');
+  cart = [];
+  updateCartUI();
+});
+
+document.getElementById('modalClose').addEventListener('click', () => {
+  document.getElementById('successModal').classList.remove('show');
+});
+
+/* ═══════════════════════════════════════
+   TABS
+═══════════════════════════════════════ */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    document.getElementById(`panel-${tab}`).classList.add('active');
+    observeReveal(document.querySelectorAll(`#panel-${tab} .reveal`));
+  });
+});
+
+/* ═══════════════════════════════════════
+   NAV SCROLL
+═══════════════════════════════════════ */
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+/* ═══════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════ */
+function observeReveal(els) {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  els.forEach(el => io.observe(el));
+}
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+renderMenu();
+observeReveal(document.querySelectorAll('.reveal'));
+</script>
+</body>
+</html>
